@@ -3,6 +3,29 @@ require 'sinatra'
 
 set :sessions, true
 
+helpers do
+	def calculate_total(cards)
+    arr = cards.map{|element| element[1]}
+
+    total = 0
+    arr.each do |a|
+      if a == "A"
+        total += 11
+      else
+        total += (a.to_i == 0 ? 10 : a.to_i)
+      end
+    end
+    
+
+    arr.select{|element| element == "A"}.count.times do
+      break if total <= 21
+      total -= 10
+    end
+
+    total
+	end
+end
+
 get '/' do
 	if session[:player_name]
 		redirect 'game'
@@ -21,7 +44,7 @@ post '/new_player' do
 end
 
 get '/game' do
-	#creat a deck and put it in session
+	#create a deck and put it in session
 	suits = ['H', 'D', 'C', 'S']
 	values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 	session[:deck] = suits.product(values).shuffle!
@@ -36,3 +59,6 @@ get '/game' do
 
 	erb :game
 end
+
+
+
