@@ -2,24 +2,39 @@
 
 <p>Welcome <%= session[:player_name] %>.</p>
 
-
-Dealer's Cards:
-<ul> 
+<div class="well">
+	<h4>Dealer's Cards:</h4>
 	<% session[:dealer_cards].each do |card| %>
-		<li><%= card.to_s %></li>
+		<%= card_image(card) %>
 	<% end %>
-</ul>
+
+	<% if @show_dealer_hit_button %>
+		<p><form action='/game/dealer/hit' method='post'>
+			<input type='submit' class='btn btn-primary' value='Click to see dealer card &rarr;'>
+		</form></p>
+	<% end %>
+</div>
+
 
 <br/>
-
-Player's Cards:
-<ul> 
+<div class="well">
+	<h4><%= session[:player_name] %>'s Cards:</h4>
 	<% session[:player_cards].each do |card| %>
-		<li><%= card.to_s %></li>
+		<%= card_image(card) %>
 	<% end %>
-</ul>
+</div>
+
 
 <p>
-	What would you like to do?
+	What would <%= session[:player_name] %> like to do?
 	<%= session[:player_name] %> has a total of <%= calculate_total(session[:player_cards]) %>.
+
+<% if @show_hit_or_stay_buttons %>
+<form id="hit_form" action="/game/player/hit" method='post'>
+	<input type="submit" class='btn btn-success' value="Hit" />
+</form>
+<form id="stay_form" action="/game/player/stay" method='post'>
+	<input type="submit" class='btn btn-warning' value="Stay" />
+</form>
+<% end %>
 </p>
