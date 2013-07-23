@@ -141,6 +141,8 @@ post '/game/player/hit' do
 	player_total = calculate_total(session[:player_cards])
 	if player_total == BLACKJACK_AMOUNT
 		winner!("#{session[:player_name]} hit blackjack!")
+		@show_hit_or_stay_buttons = false
+		redirect '/game/dealer'
 	elsif calculate_total(session[:player_cards]) > BLACKJACK_AMOUNT
 		loser!("It looks like #{session[:player_name]} busted at #{player_total}.")
 	end
@@ -189,6 +191,9 @@ get '/game/compare' do
 
 	if player_total < dealer_total
 		loser!("#{session[:player_name]} stayed at #{player_total} and the dealer stayed at #{dealer_total}.")
+		if params[:player_pot].to_i == 0
+			redirect '/bankrupt'
+		end
 	elsif player_total > dealer_total
 		winner!("#{session[:player_name]} stayed at #{player_total} and the dealer stayed at #{dealer_total}.")
 	else
@@ -202,3 +207,6 @@ get '/game_over' do
 	erb :game_over
 end
 
+get '/bankrupt' do
+	erb :bankrupt
+end
