@@ -58,10 +58,13 @@ helpers do
 	end
 
 	def loser!(msg)
-		@play_again = true
 		@show_hit_or_stay_buttons = false
 		session[:player_pot] = session[:player_pot] - session[:player_bet]
 		@error = "<strong>#{session[:player_name]} loses.</strong> #{msg}"
+		if params[:player_pot].to_i == 0
+			@play_again = false
+		else @play_again = true
+		end
 	end
 
 	def tie!(msg)
@@ -94,7 +97,7 @@ post '/new_player' do
 		halt erb(:new_player)
 	end
 
-	session[:player_name] = params[:player_name]
+	session[:player_name] = params[:player_name].capitalize
 	redirect '/bet'
 end
 
@@ -106,10 +109,10 @@ end
 post '/bet' do
 	if params[:bet_amount].nil? || params[:bet_amount].to_i == 0
 		@error = "Must make a bet."
-		halt erb(:erb)
+		halt erb(:bet)
 	elsif params[:bet_amount].to_i > session[:player_pot]
 		@error = "Bet amount cannot be greater than what you have (#{session[:player_pot]}"
-		halt erb(:erb)
+		halt erb(:bet)
 	else
 		session[:player_bet] = params[:bet_amount].to_i
 		redirect '/game'
@@ -140,7 +143,7 @@ post '/game/player/hit' do
 
 	player_total = calculate_total(session[:player_cards])
 	if player_total == BLACKJACK_AMOUNT
-		winner!("#{session[:player_name]} hit blackjack!")
+		@success = "#{session[:player_name]} hit blackjack!"
 		@show_hit_or_stay_buttons = false
 		redirect '/game/dealer'
 	elsif calculate_total(session[:player_cards]) > BLACKJACK_AMOUNT
@@ -191,9 +194,6 @@ get '/game/compare' do
 
 	if player_total < dealer_total
 		loser!("#{session[:player_name]} stayed at #{player_total} and the dealer stayed at #{dealer_total}.")
-		if params[:player_pot].to_i == 0
-			redirect '/bankrupt'
-		end
 	elsif player_total > dealer_total
 		winner!("#{session[:player_name]} stayed at #{player_total} and the dealer stayed at #{dealer_total}.")
 	else
