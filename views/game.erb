@@ -45,10 +45,11 @@
 
 
 <p>
-	What would <%= session[:player_name] %> like to do?
-	<%= session[:player_name] %> has a total of <%= calculate_total(session[:player_cards]) %>.
+	
+	<%= session[:player_name] %>, your total is <%= calculate_total(session[:player_cards]) %>.
 
 <% if @show_hit_or_stay_buttons %>
+	What would you like to do, <%= session[:player_name] %>?
 <form id="hit_form" action="/game/player/hit" method='post'>
 	<input type="submit" class='btn btn-large btn-success' value="Hit" />
 </form>

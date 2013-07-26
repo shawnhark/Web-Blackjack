@@ -58,13 +58,10 @@ helpers do
 	end
 
 	def loser!(msg)
+		@play_again = true
 		@show_hit_or_stay_buttons = false
 		session[:player_pot] = session[:player_pot] - session[:player_bet]
 		@error = "<strong>#{session[:player_name]} loses.</strong> #{msg}"
-		if params[:player_pot].to_i == 0
-			@play_again = false
-		else @play_again = true
-		end
 	end
 
 	def tie!(msg)
@@ -107,6 +104,10 @@ get '/bet' do
 end
 
 post '/bet' do
+	if session[:player_pot].to_i == 0
+		redirect '/bankrupt'
+	end
+
 	if params[:bet_amount].nil? || params[:bet_amount].to_i == 0
 		@error = "Must make a bet."
 		halt erb(:bet)
@@ -171,10 +172,8 @@ get '/game/dealer' do
 	elsif dealer_total > BLACKJACK_AMOUNT
 		winner!("The dealer busted at #{dealer_total}.")
 	elsif dealer_total >= DEALER_MIN_HIT
-
 		redirect '/game/compare'
 	else
-
 		@show_dealer_hit_button = true
 	end
 
@@ -199,7 +198,7 @@ get '/game/compare' do
 	else
 		tie!("Both #{session[:player_name]} and the dealer stayed at #{player_total}.")
 	end
-		
+
 	erb :game
 end
 
