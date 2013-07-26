@@ -100,13 +100,14 @@ end
 
 get '/bet' do
 	session[:player_bet] = nil
+	if session[:player_pot].to_i == 0
+		redirect '/bankrupt'
+	end
 	erb :bet
 end
 
 post '/bet' do
-	if session[:player_pot].to_i == 0
-		redirect '/bankrupt'
-	elsif params[:bet_amount].nil? || params[:bet_amount].to_i == 0
+	if params[:bet_amount].nil? || params[:bet_amount].to_i == 0
 		@error = "Must make a bet."
 		halt erb(:bet)
 	elsif params[:bet_amount].to_i > session[:player_pot]
